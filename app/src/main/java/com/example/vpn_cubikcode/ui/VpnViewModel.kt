@@ -5,7 +5,6 @@ import android.content.Intent
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.vpn_cubikcode.BuildConfig
 import com.example.vpn_cubikcode.data.ConfigRepository
 import com.example.vpn_cubikcode.util.JsonValidator
 import com.example.vpn_cubikcode.util.SampleConfigs
@@ -27,6 +26,8 @@ data class VpnUiState(
 class VpnViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository = ConfigRepository(application)
+    private val isDebugBuild: Boolean =
+        (application.applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE) != 0
 
     private val _configText = MutableStateFlow("")
     val configText: StateFlow<String> = _configText.asStateFlow()
@@ -38,7 +39,7 @@ class VpnViewModel(application: Application) : AndroidViewModel(application) {
         val saved = repository.getConfig()
         _configText.value = when {
             saved.isNotBlank() -> saved
-            BuildConfig.DEBUG -> SampleConfigs.XRAY_VLESS_REALITY
+            isDebugBuild -> SampleConfigs.XRAY_VLESS_REALITY
             else -> ""
         }
 
